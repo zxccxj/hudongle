@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Romantic Rotating Photo Gallery</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(45deg, #ffc0cb, #87ceeb);
+        }
+
+       .gallery-container {
+            position: relative;
+            width: 350px;
+            height: 350px;
+            perspective: 1000px;
+        }
+
+        @media (max-width: 768px) {
+           .gallery-container {
+                width: 250px;
+                height: 250px;
+            }
+        }
+
+       .gallery {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            animation: rotate 20s linear infinite;
+        }
+
+       .gallery.paused {
+            animation-play-state: paused;
+        }
+
+       .gallery.reverse {
+            animation-direction: reverse;
+        }
+
+       .gallery.tilt {
+            animation: tiltRotate 20s linear infinite;
+        }
+
+       .gallery-item {
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            width: 80%;
+            height: 80%;
+            backface-visibility: hidden;
+            transform-origin: center;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.5s ease;
+        }
+
+       .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotateY(0deg);
+            }
+            100% {
+                transform: rotateY(360deg);
+            }
+        }
+
+        @keyframes tiltRotate {
+            0% {
+                transform: rotateY(0deg) rotateX(15deg);
+            }
+            50% {
+                transform: rotateY(180deg) rotateX(-15deg);
+            }
+            100% {
+                transform: rotateY(360deg) rotateX(15deg);
+            }
+        }
+
+       .control-buttons {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+       .control-buttons button {
+            padding: 8px 15px;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+       .control-buttons button:hover {
+            background-color: rgba(255, 255, 255, 1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="gallery-container">
+        <div class="gallery">
+            <!-- 图片 1 -->
+            <div class="gallery-item" style="transform: rotateY(0deg) translateZ(300px);">
+                <img src="1.png" alt="Image 1">
+            </div>
+            <!-- 图片 2 -->
+            <div class="gallery-item" style="transform: rotateY(60deg) translateZ(300px);">
+                <img src="2.png" alt="Image 2">
+            </div>
+            <!-- 图片 3 -->
+            <div class="gallery-item" style="transform: rotateY(120deg) translateZ(300px);">
+                <img src="3.png" alt="Image 3">
+            </div>
+            <!-- 图片 4 -->
+            <div class="gallery-item" style="transform: rotateY(180deg) translateZ(300px);">
+                <img src="4.png" alt="Image 4">
+            </div>
+            <!-- 图片 5 -->
+            <div class="gallery-item" style="transform: rotateY(240deg) translateZ(300px);">
+                <img src="5.png" alt="Image 5">
+            </div>
+            <!-- 图片 6 -->
+            <div class="gallery-item" style="transform: rotateY(300deg) translateZ(300px);">
+                <img src="6.png" alt="Image 6">
+            </div>
+        </div>
+        <div class="control-buttons">
+            <button id="pause-button">暂停</button>
+            <button id="resume-button">继续</button>
+            <button id="speed-up-button">加速</button>
+            <button id="slow-down-button">减速</button>
+            <button id="reverse-button">反向旋转</button>
+            <button id="random-rotate-button">随机旋转</button>
+            <button id="tilt-rotate-button">倾斜旋转</button>
+        </div>
+    </div>
+
+    <script>
+        const gallery = document.querySelector('.gallery');
+        const pauseButton = document.getElementById('pause-button');
+        const resumeButton = document.getElementById('resume-button');
+        const speedUpButton = document.getElementById('speed-up-button');
+        const slowDownButton = document.getElementById('slow-down-button');
+        const reverseButton = document.getElementById('reverse-button');
+        const randomRotateButton = document.getElementById('random-rotate-button');
+        const tiltRotateButton = document.getElementById('tilt-rotate-button');
+
+        let currentSpeed = 20; // 初始旋转速度（秒）
+        let isReversed = false;
+        let isTilt = false;
+        let isPaused = false;
+
+        function updateAnimation() {
+            const animationName = isTilt ? 'tiltRotate' : 'rotate';
+            const animationDirection = isReversed ? 'reverse' : 'normal';
+            const animationPlayState = isPaused ? 'paused' : 'running';
+
+            gallery.style.animation = `${animationName} ${currentSpeed}s linear ${animationDirection} infinite`;
+            gallery.style.animationPlayState = animationPlayState;
+        }
+
+        // 暂停旋转
+        pauseButton.addEventListener('click', () => {
+            isPaused = true;
+            updateAnimation();
+        });
+
+        // 继续旋转
+        resumeButton.addEventListener('click', () => {
+            isPaused = false;
+            updateAnimation();
+        });
+
+        // 加速旋转
+        speedUpButton.addEventListener('click', () => {
+            currentSpeed = Math.max(5, currentSpeed - 5);
+            updateAnimation();
+        });
+
+        // 减速旋转
+        slowDownButton.addEventListener('click', () => {
+            currentSpeed += 5;
+            updateAnimation();
+        });
+
+        // 反向旋转
+        reverseButton.addEventListener('click', () => {
+            isReversed = !isReversed;
+            updateAnimation();
+        });
+
+        // 随机旋转
+        randomRotateButton.addEventListener('click', () => {
+            const randomAngle = Math.floor(Math.random() * 360);
+            const style = document.createElement('style');
+            if (isTilt) {
+                style.innerHTML = `
+                    @keyframes tiltRotate {
+                        0% {
+                            transform: rotateY(${randomAngle}deg) rotateX(15deg);
+                        }
+                        50% {
+                            transform: rotateY(${randomAngle + 180}deg) rotateX(-15deg);
+                        }
+                        100% {
+                            transform: rotateY(${randomAngle + 360}deg) rotateX(15deg);
+                        }
+                    }
+                `;
+            } else {
+                style.innerHTML = `
+                    @keyframes rotate {
+                        0% {
+                            transform: rotateY(${randomAngle}deg);
+                        }
+                        100% {
+                            transform: rotateY(${randomAngle + 360}deg);
+                        }
+                    }
+                `;
+            }
+            document.head.appendChild(style);
+            gallery.style.animation = 'none';
+            void gallery.offsetWidth;
+            updateAnimation();
+        });
+
+        // 倾斜旋转
+        tiltRotateButton.addEventListener('click', () => {
+            isTilt = !isTilt;
+            updateAnimation();
+        });
+
+        // 鼠标悬停放大图片
+        const galleryItems = document.querySelectorAll('.gallery-item');
+        galleryItems.forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                item.style.transform = `${item.style.transform} scale(1.1)`;
+            });
+            item.addEventListener('mouseleave', () => {
+                item.style.transform = item.style.transform.replace(' scale(1.1)', '');
+            });
+        });
+
+        // 触摸事件处理（适配手机）
+        let touchStartX = 0;
+        let isDragging = false;
+
+        gallery.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            isDragging = true;
+            isPaused = true;
+            updateAnimation();
+        });
+
+        gallery.addEventListener('touchmove', (e) => {
+            if (isDragging) {
+                const touchEndX = e.touches[0].clientX;
+                const deltaX = touchEndX - touchStartX;
+                const rotationSpeed = 0.5;
+                const currentRotation = parseFloat(getComputedStyle(gallery).transform.match(/rotateY\(([^)]+)\)/)[1]);
+                const newRotation = currentRotation + deltaX * rotationSpeed;
+                if (isTilt) {
+                    const tiltAngle = parseFloat(getComputedStyle(gallery).transform.match(/rotateX\(([^)]+)\)/)[1]);
+                    gallery.style.transform = `rotateY(${newRotation}deg) rotateX(${tiltAngle}deg)`;
+                } else {
+                    gallery.style.transform = `rotateY(${newRotation}deg)`;
+                }
+                touchStartX = touchEndX;
+            }
+        });
+
+        gallery.addEventListener('touchend', () => {
+            isDragging = false;
+            isPaused = false;
+            updateAnimation();
+        });
+    </script>
+</body>
+
+</html>
